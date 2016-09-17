@@ -42,13 +42,14 @@
             this.searchPattern = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.copyMissing = new System.Windows.Forms.CheckBox();
+            this.moveMissing = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // goBtn
             // 
-            this.goBtn.Location = new System.Drawing.Point(369, 347);
+            this.goBtn.Location = new System.Drawing.Point(312, 575);
             this.goBtn.Name = "goBtn";
-            this.goBtn.Size = new System.Drawing.Size(75, 23);
+            this.goBtn.Size = new System.Drawing.Size(132, 35);
             this.goBtn.TabIndex = 0;
             this.goBtn.Text = "Go";
             this.goBtn.UseVisualStyleBackColor = true;
@@ -108,17 +109,17 @@
             // 
             // resultsTxt
             // 
-            this.resultsTxt.Location = new System.Drawing.Point(15, 191);
+            this.resultsTxt.Location = new System.Drawing.Point(15, 226);
             this.resultsTxt.Multiline = true;
             this.resultsTxt.Name = "resultsTxt";
             this.resultsTxt.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.resultsTxt.Size = new System.Drawing.Size(429, 150);
+            this.resultsTxt.Size = new System.Drawing.Size(429, 343);
             this.resultsTxt.TabIndex = 7;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 175);
+            this.label3.Location = new System.Drawing.Point(12, 210);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(42, 13);
             this.label3.TabIndex = 8;
@@ -169,12 +170,25 @@
             this.copyMissing.TabIndex = 13;
             this.copyMissing.Text = "Copy missing files?";
             this.copyMissing.UseVisualStyleBackColor = true;
+            this.copyMissing.CheckedChanged += new System.EventHandler(this.copyMissing_CheckedChanged);
+            // 
+            // moveMissing
+            // 
+            this.moveMissing.AutoSize = true;
+            this.moveMissing.Location = new System.Drawing.Point(98, 166);
+            this.moveMissing.Name = "moveMissing";
+            this.moveMissing.Size = new System.Drawing.Size(117, 17);
+            this.moveMissing.TabIndex = 14;
+            this.moveMissing.Text = "Move missing files?";
+            this.moveMissing.UseVisualStyleBackColor = true;
+            this.moveMissing.CheckedChanged += new System.EventHandler(this.moveMissing_CheckedChanged);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(456, 382);
+            this.ClientSize = new System.Drawing.Size(456, 622);
+            this.Controls.Add(this.moveMissing);
             this.Controls.Add(this.copyMissing);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.searchPattern);
@@ -189,10 +203,12 @@
             this.Controls.Add(this.dropboxFolderTxt);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.goBtn);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "MainForm";
             this.Text = "Are all these files in Dropbox already?";
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -211,6 +227,7 @@
         private System.Windows.Forms.TextBox searchPattern;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox copyMissing;
+        private System.Windows.Forms.CheckBox moveMissing;
     }
 }
 

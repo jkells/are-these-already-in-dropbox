@@ -52,6 +52,10 @@ namespace AreTheseFoldersInDropbox
             bool copyMissingSetting;
             if (bool.TryParse(appNameKey?.GetValue("copyMissing", false) as string ?? "", out copyMissingSetting))
                 copyMissing.Checked = copyMissingSetting;
+
+            bool moveMissingSetting;
+            if (bool.TryParse(appNameKey?.GetValue("moveMissing", false) as string ?? "", out moveMissingSetting))
+                moveMissing.Checked = moveMissingSetting;
         }
 
         private void Save()
@@ -65,6 +69,7 @@ namespace AreTheseFoldersInDropbox
             appNameKey?.SetValue("dropboxFolderRecurse", dropboxFolderRecurse.Checked);
             appNameKey?.SetValue("searchPattern", searchPattern.Text);
             appNameKey?.SetValue("copyMissing", copyMissing.Checked);
+            appNameKey?.SetValue("moveMissing", moveMissing.Checked);
         }
 
         private async void goBtn_Click(object sender, EventArgs e)
@@ -75,14 +80,13 @@ namespace AreTheseFoldersInDropbox
             {
                 var dropBoxFiles = await ReadDropBoxFiles();
                 var missingFiles = await LookForMissingFiles(dropBoxFiles);
-
-                resultsTxt.Text += $"{missingFiles.Count} files missing\r\n";
+                
                 foreach (var missingFile in missingFiles)
                 {
                     resultsTxt.Text += $"File missing: {missingFile.FullName}\r\n";
                 }
 
-                if (copyMissing.Checked)
+                if (copyMissing.Checked || moveMissing.Checked)
                 {
                     await CopyMissingFiles(missingFiles);
                 }
@@ -100,7 +104,20 @@ namespace AreTheseFoldersInDropbox
             foreach (var missingFile in missingFiles)
             {
                 resultsTxt.Text += $"Copying: {missingFile.FullName}\r\n";
-                await Task.Run(()=>missingFile.CopyTo($"{destination}{Path.DirectorySeparatorChar}{missingFile.Name}", false));
+                var delete = moveMissing.Checked;
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        missingFile.CopyTo($"{destination}{Path.DirectorySeparatorChar}{missingFile.Name}", false);
+                        if (delete)
+                            missingFile.Delete();
+                    }
+                    catch (Exception exception)
+                    {
+                        resultsTxt.Text += $"Exception copying {missingFile.FullName}: {exception}\r\n";
+                    }
+                });
             }
         }
 
@@ -128,6 +145,9 @@ namespace AreTheseFoldersInDropbox
                     resultsTxt.Text += $"Exception processing {fileInfo.FullName}: {exception}\r\n";
                 }
             }
+
+            resultsTxt.Text += $"{files2.Length - missingFiles.Count} files found\r\n";
+            resultsTxt.Text += $"{missingFiles.Count} files missing\r\n";
             return missingFiles;
         }
 
@@ -148,11 +168,11 @@ namespace AreTheseFoldersInDropbox
             {
                 try
                 {
-                    dropBoxFiles.Add(await CaclculateMd5(fileInfo), fileInfo);
+                    dropBoxFiles[await CaclculateMd5(fileInfo)] = fileInfo;
                 }
                 catch (Exception exception)
                 {
-                    resultsTxt.Text += $"Exception copying {fileInfo.FullName}: {exception}\r\n";
+                    resultsTxt.Text += $"Exception hashing {fileInfo.FullName}: {exception}\r\n";
                 }
             }
             return dropBoxFiles;
@@ -170,6 +190,18 @@ namespace AreTheseFoldersInDropbox
                     }
                 }
             });
+        }
+
+        private void copyMissing_CheckedChanged(object sender, EventArgs e)
+        {
+            if (copyMissing.Checked)
+                moveMissing.Checked = false;
+        }
+
+        private void moveMissing_CheckedChanged(object sender, EventArgs e)
+        {
+            if (moveMissing.Checked)
+                copyMissing.Checked = false;
         }
     }
 }
